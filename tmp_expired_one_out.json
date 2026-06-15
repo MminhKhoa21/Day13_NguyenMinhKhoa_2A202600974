@@ -1,0 +1,53 @@
+{
+  "phase": "private",
+  "n": 1,
+  "users": null,
+  "turns": null,
+  "config_used": {
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "model_price_tier": "standard",
+    "max_steps": 6,
+    "loop_guard": true,
+    "temperature": 0.15,
+    "context_size": 2,
+    "verbose_system": false,
+    "retry": {
+      "enabled": true,
+      "max_attempts": 3,
+      "backoff_ms": 5000
+    },
+    "cache": {
+      "enabled": true
+    },
+    "normalize_unicode": true,
+    "redact_pii": true,
+    "session_drift_rate": 0.0,
+    "context_reset_every": 8,
+    "tool_error_rate": 0.0,
+    "catalog_override": {},
+    "planner": false,
+    "verify": true,
+    "self_consistency": 1,
+    "tool_budget": 4,
+    "prompt_chars": 1432,
+    "custom_prompt": true
+  },
+  "results": [
+    {
+      "qid": "dbg-expired",
+      "question": "Mua 1 iPad voi coupon EXPIRED, ship Da Nang - tong cong bao nhieu VND?",
+      "answer": "Tong cong: 18035000 VND",
+      "status": "ok",
+      "session": "dbg",
+      "turn": 0,
+      "ts": "2026-06-13T00:00:00.107783Z"
+    }
+  ],
+  "sealed": {
+    "alg": "HMAC-SHA256",
+    "note": "binary-measured metrics for scoring; build your own observability in wrapper.py",
+    "data": "W3siZXJyb3IiOiBudWxsLCAibGF0ZW5jeV9tcyI6IDY0MTEsICJtb2RlbCI6ICJncHQtNG8tbWluaSIsICJwaWkiOiBmYWxzZSwgInByb3ZpZGVyIjogIm9wZW5haSIsICJzdGVwcyI6IDEsICJ0b29sc191c2VkIjogWyJjaGVja19zdG9jayIsICJnZXRfZGlzY291bnQiLCAiY2FsY19zaGlwcGluZyJdLCAidXNhZ2UiOiB7ImNvbXBsZXRpb25fdG9rZW5zIjogMTQ3LCAicHJvbXB0X3Rva2VucyI6IDM4MTMsICJ0b3RhbF90b2tlbnMiOiAzOTYwfX1d",
+    "sig": "7916c30046e83cea2d224524cddd730dab4c515e0179976186c2a6b57038011d"
+  }
+}

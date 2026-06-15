@@ -1,0 +1,21 @@
+{
+  "team": "minhkhoa",
+  "phase": "private",
+  "headline": 92.16,
+  "sub": {
+    "correct": 0.535,
+    "quality": 0.7054,
+    "error": 1.0,
+    "latency": 0.8148,
+    "cost": 0.7577,
+    "drift": 0.6825,
+    "prompt": 0.7089
+  },
+  "diag_f1": 1.0,
+  "n": 80,
+  "n_correct": 35,
+  "judge_mode": "offline",
+  "weights_hash": "e81a8ed58d93",
+  "key_hash": "7e3905b75db0",
+  "sig": "d8e9261a5241b63d5b7e6205c924c8969e997f04626f424490b4c6d76269aaab"
+}

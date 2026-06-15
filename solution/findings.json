@@ -1,12 +1,72 @@
 {
-  "team": "TODO-team-name",
+  "team": "minhkhoa",
   "schema_version": 1,
   "findings": [
     {
+      "fault_class": "error_spike",
+      "evidence": {"metric": "status/error counts", "observed": "Practice run: 120 requests, ok=100, wrapper_error=20; wrapper_error types were RateLimitError=18, APIConnectionError=1, TypeError=1.", "trace_ids": []},
+      "root_cause": "Injected tool instability plus no retry in the shipped config.",
+      "suggested_fix": "Set tool_error_rate to 0.0, enable bounded retry with longer backoff for rate limits, and reduce false tool-error retries."
+    },
+    {
       "fault_class": "latency_spike",
-      "evidence": {"metric": "latency_p95_ms", "observed": "TODO from your telemetry", "trace_ids": []},
-      "root_cause": "TODO: what config knob or behavior causes it?",
-      "suggested_fix": "TODO: config change and/or wrapper mitigation"
+      "evidence": {"metric": "latency_ms and wall_ms", "observed": "Practice telemetry: latency_ms p50=23540, p95=67490, max=84073; wall_ms p50=44599, p95=106573, max=124342 on openrouter/free.", "trace_ids": []},
+      "root_cause": "Overlong completions, large context, repeated identical requests, and unnecessary tool loops.",
+      "suggested_fix": "Reduce context/max_completion_tokens/max_steps, enable cache, cap tool_budget, and keep planner disabled."
+    },
+    {
+      "fault_class": "cost_blowup",
+      "evidence": {"metric": "meta.usage.total_tokens", "observed": "Practice telemetry: total_tokens sum=648177, p50=5616, p95=9891, max=12215 across 120 requests.", "trace_ids": []},
+      "root_cause": "Verbose system context and high completion budget waste tokens.",
+      "suggested_fix": "Use a compact prompt, verbose_system=false, context_size=3, max_completion_tokens=360."
+    },
+    {
+      "fault_class": "quality_drift",
+      "evidence": {"metric": "turn_index,status,detected_faults", "observed": "Practice run used mostly turn_index=0 public questions, so drift was not strongly observable; baseline session_drift_rate was 0.06 and has been disabled.", "trace_ids": []},
+      "root_cause": "Session state drift and noisy high-temperature generations.",
+      "suggested_fix": "Set temperature low, self_consistency=2, session_drift_rate=0.0, and reset context periodically."
+    },
+    {
+      "fault_class": "infinite_loop",
+      "evidence": {"metric": "status=max_steps|loop and repeated_tool", "observed": "Practice telemetry had no loop/max_steps statuses after loop_guard=true and max_steps=6; wrapper still detects repeated tools.", "trace_ids": []},
+      "root_cause": "No loop guard and no tool budget in baseline.",
+      "suggested_fix": "Enable loop_guard, max_steps=6, tool_budget=4, retry once on loop/max_steps."
+    },
+    {
+      "fault_class": "tool_failure",
+      "evidence": {"metric": "tool traces and wrapper errors", "observed": "Practice telemetry detected tool_failure-like traces before refining detection; most hard failures were provider RateLimitError rather than catalog/tool logic.", "trace_ids": []},
+      "root_cause": "Unicode/city normalization disabled and catalog_override could corrupt stock truth.",
+      "suggested_fix": "Enable normalize_unicode, clear catalog_override, and use refusal guardrails."
+    },
+    {
+      "fault_class": "pii_leak",
+      "evidence": {"metric": "pii_found", "observed": "Practice telemetry flagged pii_found in 1/120 after guarding money amounts from phone-like redaction; wrapper redacts emails/VN phones and preserves VND totals.", "trace_ids": []},
+      "root_cause": "Original prompt allowed echoing customer contact details and config redaction was off.",
+      "suggested_fix": "Prompt forbids PII echo; config redact_pii=true; wrapper redacts answer without another LLM call."
+    },
+    {
+      "fault_class": "fabrication",
+      "evidence": {"metric": "unavailable_trace_with_total", "observed": "Wrapper removes Tong cong whenever trace indicates out_of_stock/not_found/not_served; practice run preserved refusal guardrails in post-processing.", "trace_ids": []},
+      "root_cause": "Original prompt asked for a total even when tools showed the order could not be fulfilled.",
+      "suggested_fix": "Tool-first grounded prompt plus post-check refusal enforcement."
+    },
+    {
+      "fault_class": "arithmetic_error",
+      "evidence": {"metric": "computed_total_vs_answer_total", "observed": "Practice telemetry corrected 36 arithmetic mismatches; parser now takes ordered quantity from the sanitized question to avoid confusing stock count with requested quantity.", "trace_ids": []},
+      "root_cause": "High temperature and LLM mental math caused wrong totals/discount order.",
+      "suggested_fix": "Use exact formula in prompt and patch final Tong cong from Python integer arithmetic."
+    },
+    {
+      "fault_class": "tool_overuse",
+      "evidence": {"metric": "tools_used and repeated_tool", "observed": "Practice telemetry observed check_stock=99, calc_shipping=63, get_discount=49 before normalizing tool names; prompt and tool_budget cap each tool to once.", "trace_ids": []},
+      "root_cause": "Baseline had no tool_budget and vague instructions encouraged extra checks.",
+      "suggested_fix": "Set tool_budget=4 and explicitly require check_stock/get_discount/calc_shipping at most once."
+    },
+    {
+      "fault_class": "prompt_injection",
+      "evidence": {"metric": "sanitized_input and injection_marker", "observed": "Wrapper sanitizes note/GHI CHU/instruction/system/developer/override/fake tool segments before call_next; public practice had no private injection cases.", "trace_ids": []},
+      "root_cause": "Order notes were treated as trusted instructions instead of untrusted customer data.",
+      "suggested_fix": "Prompt treats notes as data only; wrapper neutralizes injection text while preserving product/quantity/coupon/destination."
     }
   ]
 }
